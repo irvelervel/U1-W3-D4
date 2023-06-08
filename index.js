@@ -4,6 +4,21 @@
 // ogni mese può avere un numero diverso di giorni, a seconda di quando apriamo la
 // pagina ci aspetteremo di ottenere un calendario aggiornato per il mese in corso
 
+// DOVE CI SALVIAMO GLI EVENTI?
+// una cassettiera :) un array con tot posizioni quante sono le giornate del mese
+
+// [ ['14:30 - Q&A', '17:00 - Debrief'], ['17:00 - Debrief'], ['14:30 - Q&A'], [], [] ]
+
+const appointments = []
+
+// [
+//  [], [], [], [], [], [],
+//  [], [], [], [], [], [],
+//  [], [], [], [], [], [],
+//  [], [], [], [], [], [],
+//  [], []
+// ]
+
 const now = new Date() // creare un nuovo oggetto Date (data)
 
 const monthNames = [
@@ -85,6 +100,12 @@ const createDays = function (days) {
   // ciclo for su days per generare un numero corrispondente di celle
   for (let i = 0; i < days; i++) {
     // per ogni giorno del mese...
+    // creo un cassettino dentro la cassettiera
+    // --> inserisco un array vuoto dentro appointments
+    appointments.push([])
+    // mi ritroverò un array appointments con tanti sotto-array quanti sono
+    // i giorni del mese
+
     // creo una cella
     let dayCellDiv = document.createElement('div')
     // <div></div>
@@ -122,7 +143,28 @@ const createDays = function (days) {
     dayCellDiv.appendChild(cellValue) // inserisco il numero del giorno nella cella
     calendarDiv.appendChild(dayCellDiv) // inserisco la cella dentro la griglia del calendario
   }
+  console.log('APPOINTMENTS', appointments)
   // i non esiste
+}
+
+const saveMeeting = function (e) {
+  e.preventDefault() // grazie all'evento scaturito dal submit fermo il comportamento di default
+  // ora posso fare quello che voglio :)
+  // recupero il giorno selezionato
+  const selectedDay = document.getElementById('newMeetingDay').innerText // "20"
+  // recupero il valore del time
+  const meetingTime = document.getElementById('newMeetingTime').value // value dell'input field
+  const meetingName = document.getElementById('newMeetingName').value // value dell'input field
+  const meetingString = meetingTime + ' - ' + meetingName // "14:30 - Q&A"
+  // const meetingString = `${meetingTime} - ${meetingName}` // "14:30 - Q&A" con backtick
+
+  // ora devo inserire la mia stringa dentro il "cassetto" giusto, il giorno corretto!
+  // lo posso recuperare da selectedDay! Però attenzione: selectedDay è stato "adattato"
+  // per essere una cella del calendario, il cassetto a cui corrisponde nella cassettiera
+  // è selectedDay - 1
+  const theRightIndex = parseInt(selectedDay) - 1
+  appointments[theRightIndex].push(meetingString)
+  console.log('APPOINTMENTS DOPO SALVATAGGIO', appointments)
 }
 
 const numberOfDays = daysInThisMonth() // 30 a giugno
@@ -131,3 +173,7 @@ const numberOfDays = daysInThisMonth() // 30 a giugno
 printCurrentMonthInH1()
 // adesso dobbiamo creare le celle del calendario
 createDays(numberOfDays)
+
+// aggiungo al form un comportamento custom al submit
+const formReference = document.querySelector('form')
+formReference.addEventListener('submit', saveMeeting)

@@ -91,6 +91,24 @@ const changeDayNumber = function (dayIndex) {
   newMeetingDaySpan.classList.add('hasDay')
 }
 
+const showAppointments = function (indexOfAppointments) {
+  // questa funzione si occuperà di:
+  // - prelevare gli eventi dal cassetto indexOfAppointments
+  const selectedDayAppointments = appointments[indexOfAppointments]
+  const appointmentsList = document.getElementById('appointmentsList') // ul
+  // ripulisco tutta la ul: potrei avere eventi generati da un click precedente
+  appointmentsList.innerHTML = ''
+  // - dovrà generare tanti <li> quante sono le stringhe contenute in appointments[indexOfAppointments]
+  selectedDayAppointments.forEach((appointment) => {
+    const newLi = document.createElement('li')
+    newLi.innerText = appointment
+    // - dovrà appendere questi <li> al dom, ovvero alla <ul> già esistente in HTML
+    appointmentsList.appendChild(newLi)
+  })
+  // - dovrà togliere il display: none dal div relativo agli appuntamenti
+  document.getElementById('appointments').style.display = 'block'
+}
+
 const createDays = function (days) {
   // days è il numero di celle da creare
 
@@ -124,6 +142,19 @@ const createDays = function (days) {
       // nello span con id = "newMeetingDay"
 
       changeDayNumber(i)
+
+      // sempre al click di una giornata, nel caso ci siano eventi da mostrare
+      // facciamo comparire la sezione "appointments"
+      // appointments[i] // è l'array degli eventi della giornata su cui ho cliccato
+      if (appointments[i].length > 0) {
+        // significa che in questa giornata ci sono degli eventi salvati!
+        // li devo mostrare...
+        showAppointments(i)
+      } else {
+        // la giornata che ho cliccato non ha eventi!
+        // ri-nascondiamo per sicurezza la sezione appointments of the day
+        document.getElementById('appointments').style.display = 'none'
+      }
     })
 
     // abbiamo creato la cella, ora creiamone il contenuto
@@ -165,6 +196,10 @@ const saveMeeting = function (e) {
   const theRightIndex = parseInt(selectedDay) - 1
   appointments[theRightIndex].push(meetingString)
   console.log('APPOINTMENTS DOPO SALVATAGGIO', appointments)
+  // svuoto gli input
+  document.getElementById('newMeetingTime').value = ''
+  document.getElementById('newMeetingName').value = ''
+  showAppointments(theRightIndex)
 }
 
 const numberOfDays = daysInThisMonth() // 30 a giugno
